@@ -10,9 +10,8 @@ class RequestData(BaseModel):
 @app.post("/predict")
 def predict(
     data: RequestData,
-    authorization: str = Header(None)
+    authorization: str = Header(None, alias="Authorization")
 ):
-    # TEMPORARY relaxed auth (for hackathon testing)
     if authorization is None:
         return {
             "status": "error",
@@ -25,3 +24,4 @@ def predict(
         "confidence": 0.5,
         "received_auth": authorization
     }
+
