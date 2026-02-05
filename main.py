@@ -1,7 +1,10 @@
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 
 app = FastAPI()
+
+security = HTTPBearer()
 
 class RequestData(BaseModel):
     message: str
@@ -10,18 +13,11 @@ class RequestData(BaseModel):
 @app.post("/predict")
 def predict(
     data: RequestData,
-    authorization: str = Header(None, alias="Authorization")
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    if authorization is None:
-        return {
-            "status": "error",
-            "message": "Authorization header missing"
-        }
-
     return {
         "status": "success",
         "is_ai_generated": False,
         "confidence": 0.5,
-        "received_auth": authorization
+        "received_token": credentials.credentials
     }
-
