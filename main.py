@@ -1,31 +1,24 @@
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
-import os
+from typing import Optional
 
 app = FastAPI()
 
-# HTTP Bearer security
-security = HTTPBearer()
-
-# REAL API KEY (recommended: use env variable)
-API_KEY = os.getenv("API_KEY", "guvi_voice_api_2026")
+API_KEY = "guvi_voice_api_2026"
 
 class RequestData(BaseModel):
-    message: str
-    audio_url: str
+    language: Optional[str] = None
+    audio_format: Optional[str] = None
+    audio_base64: Optional[str] = None
 
 @app.post("/predict")
 def predict(
     data: RequestData,
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    x_api_key: str = Header(None)
 ):
     # 🔒 API key validation
-    if credentials.credentials != API_KEY:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid API key"
-        )
+    if x_api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API key")
 
     return {
         "status": "success",
