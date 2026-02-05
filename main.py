@@ -11,7 +11,7 @@ class RequestData(BaseModel):
 
 @app.post("/predict")
 def predict(data: RequestData, authorization: str = Header(None)):
-    if authorization != "Bearer 123456":
+     if not authorization or "123456" not in authorization:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     return {
